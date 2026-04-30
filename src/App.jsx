@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import UploadPage from "./pages/UploadPage.jsx";
 import ViewPage from "./pages/ViewPage.jsx";
+import SecurityAlert from "./components/SecurityAlert.jsx";
+import { useSecurityBlock } from "./hooks/useSecurityBlock.js";
 
-/* ── Shared colour tokens ──────────────────────────────────────────────── */
 export const C = {
   purple:     "#534AB7",
   purpleLight:"#EEEDFE",
@@ -28,8 +29,8 @@ export function Badge({ type }) {
     ppt:   ["PPT",     C.amberLight,  C.amber],
   }[type] || ["FILE", "#eee", "#555"];
   return (
-    <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 9px", borderRadius: 20,
-      background: cfg[1], color: cfg[2], letterSpacing: ".03em" }}>
+    <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 9px",
+      borderRadius: 20, background: cfg[1], color: cfg[2], letterSpacing: ".03em" }}>
       {cfg[0]}
     </span>
   );
@@ -46,29 +47,30 @@ export function LockChip({ label, bg, color }) {
 
 export function InfoBox({ children }) {
   return (
-    <div style={{ marginTop: 12, padding: "10px 14px", background: C.bg, border: `0.5px solid ${C.border}`,
-      borderRadius: 8, fontSize: 11, color: "#555", lineHeight: 1.7 }}>
+    <div style={{ marginTop: 12, padding: "10px 14px", background: C.bg,
+      border: `0.5px solid ${C.border}`, borderRadius: 8,
+      fontSize: 11, color: "#555", lineHeight: 1.7 }}>
       {children}
     </div>
   );
 }
 
 export default function App() {
-  /* Global material store — in production this lives in your DB / S3 */
   const [materials, setMaterials] = useState([]);
-  const [tab, setTab]             = useState("upload");
-  const [toast, setToast]         = useState("");
+  const [tab,       setTab]       = useState("upload");
+  const [toast,     setToast]     = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
 
-  function addMaterial(mat) {
-    setMaterials(m => [...m, mat]);
-  }
-  function removeMaterial(id) {
-    setMaterials(m => m.filter(x => x.id !== id));
-  }
+  // Global security — fires on every blocked action across ALL pages
+  const handleSecurityAttempt = useCallback(() => {
+    setAlertOpen(true);
+  }, []);
+  useSecurityBlock(handleSecurityAttempt);
 
+  function addMaterial(mat)    { setMaterials(m => [...m, mat]); }
+  function removeMaterial(id)  { setMaterials(m => m.filter(x => x.id !== id)); }
   function showToast(msg, isErr = false) {
-    setToast({ msg, isErr });
-    setTimeout(() => setToast(""), 3500);
+    setToast({ msg, isErr }); setTimeout(() => setToast(""), 3500);
   }
 
   const navItem = (key, label) => (
@@ -91,30 +93,29 @@ export default function App() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column",
+      userSelect: "none", WebkitUserSelect: "none" }}>
 
-      {/* ── Toast ── */}
+      {/* Global security alert */}
+      <SecurityAlert visible={alertOpen} onClose={() => setAlertOpen(false)} />
+
+      {/* Toast */}
       {toast && (
-        <div style={{
-          position: "fixed", top: 16, right: 16, zIndex: 9999,
+        <div style={{ position: "fixed", top: 16, right: 16, zIndex: 9999,
           background: toast.isErr ? "#A32D2D" : "#1D9E75",
           color: "#fff", padding: "11px 20px", borderRadius: 10,
           fontSize: 13, fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,.15)",
-          animation: "fadeIn .2s ease",
-        }}>
+          animation: "fadeIn .2s ease" }}>
           {toast.msg}
         </div>
       )}
 
-      {/* ── Nav ── */}
-      <nav style={{
-        display: "flex", alignItems: "center",
-        borderBottom: `0.5px solid ${C.border}`,
-        padding: "0 24px", background: "#fff",
-        position: "sticky", top: 0, zIndex: 100,
-      }}>
-        {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: 24, padding: "12px 0" }}>
+      {/* Nav */}
+      <nav style={{ display: "flex", alignItems: "center",
+        borderBottom: `0.5px solid ${C.border}`, padding: "0 24px",
+        background: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8,
+          marginRight: 24, padding: "12px 0" }}>
           <div style={{ width: 28, height: 28, background: C.purple, borderRadius: 7,
             display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ width: 13, height: 13, border: "2.5px solid #fff", borderRadius: 3 }} />
@@ -128,8 +129,11 @@ export default function App() {
         {navItem("upload", "Upload materials")}
         {navItem("view",   "View materials")}
 
-        {/* POC badge */}
-        <div style={{ marginLeft: "auto" }}>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 10, background: "#E1F5EE", color: "#085041",
+            padding: "3px 10px", borderRadius: 20, fontWeight: 600 }}>
+            🔒 All pages secured
+          </span>
           <span style={{ fontSize: 10, background: C.amberLight, color: C.amber,
             padding: "3px 10px", borderRadius: 20, fontWeight: 600 }}>
             POC Demo
@@ -137,20 +141,33 @@ export default function App() {
         </div>
       </nav>
 
-      {/* ── Pages ── */}
       <main style={{ flex: 1 }}>
         {tab === "upload"
-          ? <UploadPage materials={materials} onAdd={addMaterial} onRemove={removeMaterial} showToast={showToast} />
+          ? <UploadPage materials={materials} onAdd={addMaterial}
+              onRemove={removeMaterial} showToast={showToast} />
           : <ViewPage   materials={materials} showToast={showToast} />
         }
       </main>
 
       <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn  { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes spin    { to { transform:rotate(360deg); } }
         input, button, textarea { font-family: inherit; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-thumb { background:#ddd; border-radius:4px; }
+
+        /* Block print across the entire app */
+        @media print {
+          #root { display: none !important; }
+          #nandi-print-block {
+            display: flex !important;
+            position: fixed; inset: 0;
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 16px;
+            font-family: sans-serif; text-align: center;
+            background: #fff;
+          }
+        }
       `}</style>
     </div>
   );
