@@ -23,7 +23,9 @@ async function parseSlide(zip, slideFile) {
 
   // Try to pull embedded images for this slide
   const slideNum = slideFile.match(/slide(\d+)\.xml/)?.[1];
-  const relsFile = `ppt/slides/_rels/slide${slideNum}.xml.rels`;
+  const slideDir = slideFile.substring(0, slideFile.lastIndexOf("/"));
+  const slideName = slideFile.substring(slideFile.lastIndexOf("/") + 1);
+  const relsFile = `${slideDir}/_rels/${slideName}.rels`;
   const images = [];
 
   if (zip.files[relsFile]) {
@@ -67,16 +69,33 @@ export default function PPTViewer({ arrayBuffer, title }) {
       try {
         const zip = await JSZip.loadAsync(arrayBuffer);
 
-        // Find and sort slide files
-        const slideFiles = Object.keys(zip.files)
-          .filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+        // Log all files for debugging
+        const allFiles = Object.keys(zip.files);
+
+        // Try strict path first, then case-insensitive fallback
+        let slideFiles = allFiles
+          .filter(n => /^ppt\/slides\/slide\d+\.xml$/i.test(n))
           .sort((a, b) => {
             const na = parseInt(a.match(/(\d+)/)[1]);
             const nb = parseInt(b.match(/(\d+)/)[1]);
             return na - nb;
           });
 
-        if (slideFiles.length === 0) throw new Error("No slides found in this file.");
+        // Fallback: any file with "slide" + number + .xml anywhere in path
+        if (slideFiles.length === 0) {
+          slideFiles = allFiles
+            .filter(n => /slide\d+\.xml$/i.test(n) && !/_rels/.test(n) && !n.includes("slideLayout") && !n.includes("slideMaster"))
+            .sort((a, b) => {
+              const na = parseInt(a.match(/(\d+)/)?.[1] || "0");
+              const nb = parseInt(b.match(/(\d+)/)?.[1] || "0");
+              return na - nb;
+            });
+        }
+
+        if (slideFiles.length === 0) {
+          const fileList = allFiles.slice(0, 20).join(", ");
+          throw new Error(`No slides found. Files in ZIP: ${fileList}`);
+        }
 
         const parsed = await Promise.all(slideFiles.map(f => parseSlide(zip, f)));
         if (cancelled) return;
