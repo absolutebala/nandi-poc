@@ -105,7 +105,7 @@ export default function ConditionsPage() {
               Security conditions
             </h1>
             <p style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
-              Nandi Foundation · Material protection POC
+              Naandi Foundation · Material protection POC
             </p>
           </div>
         </div>

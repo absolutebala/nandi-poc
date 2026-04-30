@@ -78,7 +78,7 @@ function SplashScreen({ onDone }) {
       transition: "opacity .6s ease",
       pointerEvents: fading ? "none" : "all",
     }}>
-      {/* Nandi Foundation */}
+      {/* Naandi Foundation */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
         <div style={{ width: 44, height: 44, background: C.purple, borderRadius: 12,
           display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -86,7 +86,7 @@ function SplashScreen({ onDone }) {
         </div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
-            Nandi Foundation
+            Naandi Foundation
           </div>
           <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
             Trainer Management App · POC
@@ -136,7 +136,7 @@ function Footer() {
       background: "#fff", flexShrink: 0,
     }}>
       <span style={{ fontSize: 11, color: C.muted }}>
-        © {new Date().getFullYear()} Nandi Foundation · Material Protection POC
+        © {new Date().getFullYear()} Naandi Foundation · Material Protection POC
       </span>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 11, color: C.muted }}>Built by</span>
@@ -218,7 +218,7 @@ export default function App() {
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: C.text, lineHeight: 1.2 }}>
-              Nandi Foundation
+              Naandi Foundation
             </div>
             <div style={{ fontSize: 9, color: C.muted, lineHeight: 1 }}>
               Material protection POC

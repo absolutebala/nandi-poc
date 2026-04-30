@@ -41,7 +41,7 @@ export default function SecurityAlert({ visible, onClose }) {
         </p>
 
         <p style={{ fontSize: 12, color: "#aaa", lineHeight: 1.6 }}>
-          This action has been blocked. Unauthorised transfer of Nandi Foundation
+          This action has been blocked. Unauthorised transfer of Naandi Foundation
           training materials is a violation of your trainer agreement.
         </p>
 
