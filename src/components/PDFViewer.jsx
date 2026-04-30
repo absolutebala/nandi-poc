@@ -45,7 +45,9 @@ export default function PDFViewer({ arrayBuffer, trainerName, title }) {
     (async () => {
       setBusy(true); setError("");
       try {
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+        // Slice a copy — PDF.js transfers ownership of the buffer (detaches it).
+        // We keep the original for the download path.
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer.slice(0)) }).promise;
         if (cancelled) return;
         pdfRef.current = pdf;
         setTotal(pdf.numPages);
@@ -88,7 +90,7 @@ export default function PDFViewer({ arrayBuffer, trainerName, title }) {
     if (!arrayBuffer) return;
     setDlBusy(true);
     try {
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer.slice(0));
       const font   = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       const date   = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       const stamp  = `${trainerName || "Trainer"} · ${date} · Nandi Foundation`;

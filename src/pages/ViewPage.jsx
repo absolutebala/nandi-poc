@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { C, Badge, LockChip, InfoBox } from "../App.jsx";
 import VimeoPlayer from "../components/VimeoPlayer.jsx";
 import PDFViewer   from "../components/PDFViewer.jsx";
+import PPTViewer   from "../components/PPTViewer.jsx";
 
 const TRAINER_NAME = "Ravi Kumar"; // In production, comes from the logged-in user JWT
 
@@ -103,52 +104,23 @@ export default function ViewPage({ materials }) {
           </div>
         )}
 
-        {/* ── PPT info ── */}
+        {/* ── PPT viewer ── */}
         {mat?.type === "ppt" && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10,
               marginBottom: 18, flexWrap: "wrap" }}>
               <Badge type="ppt" />
               <span style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{mat.title}</span>
-              <LockChip label="Server-side conversion in production"
+              <LockChip label="View only · watermark on download"
                 bg={C.amberLight} color={C.amber} />
             </div>
-
-            <div style={{ padding: "32px 24px", textAlign: "center",
-              background: C.bg, borderRadius: 12, border: `0.5px solid ${C.border}` }}>
-              <div style={{ fontSize: 44, marginBottom: 14 }}>📊</div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: C.text, marginBottom: 10 }}>
-                {mat.title}
-              </p>
-              <p style={{ fontSize: 13, color: C.muted, maxWidth: 440,
-                margin: "0 auto 24px", lineHeight: 1.7 }}>
-                PPT/PPTX files are converted server-side to a protected PDF, then delivered
-                through the same watermarked canvas viewer — with download completely disabled.
-              </p>
-
-              {/* Production flow steps */}
-              <div style={{ display: "inline-flex", flexDirection: "column", gap: 8,
-                textAlign: "left", background: "#fff", border: `0.5px solid ${C.border}`,
-                borderRadius: 10, padding: "16px 22px" }}>
-                {[
-                  ["1", "PPT uploaded to private S3 bucket"],
-                  ["2", "Server converts PPT → PDF (LibreOffice)"],
-                  ["3", "Original PPT permanently discarded"],
-                  ["4", "PDF served via signed URL (30 min TTL)"],
-                  ["5", "Canvas viewer renders with trainer watermark"],
-                ].map(([n, label]) => (
-                  <div key={n} style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ width: 22, height: 22, borderRadius: "50%",
-                      background: C.tealLight, color: C.teal, fontSize: 11, fontWeight: 700,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      flexShrink: 0 }}>
-                      {n}
-                    </span>
-                    <span style={{ fontSize: 12, color: C.text }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PPTViewer arrayBuffer={mat.arrayBuffer} title={mat.title} />
+            <InfoBox>
+              <strong>View:</strong> Slides parsed from PPTX in-browser using JSZip — text and images
+              rendered cleanly with no watermark. Right-click and drag disabled.{" "}
+              <strong>In production:</strong> server converts PPTX → PDF via LibreOffice, injects
+              trainer watermark server-side, and serves via a signed S3 URL to the canvas viewer.
+            </InfoBox>
           </div>
         )}
       </section>
