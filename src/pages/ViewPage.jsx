@@ -87,19 +87,16 @@ export default function ViewPage({ materials }) {
               marginBottom: 18, flexWrap: "wrap" }}>
               <Badge type="pdf" />
               <span style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{mat.title}</span>
-              <LockChip label="Watermarked · canvas · no download"
+              <LockChip label="Canvas render · fully protected"
                 bg={C.coralLight} color={C.coral} />
             </div>
 
-            <PDFViewer arrayBuffer={mat.arrayBuffer} trainerName={TRAINER_NAME} title={mat.title} />
+            <PDFViewer arrayBuffer={mat.arrayBuffer} fileName={mat.title} />
 
             <InfoBox>
-              <strong>View:</strong> Clean render via PDF.js canvas — no watermark, no distractions.
-              Ctrl+P, Cmd+P, Ctrl+S, right-click and drag are all blocked.{" "}
-              <strong>Download:</strong> Clicking the download button applies a watermark (trainer name + date)
-              using pdf-lib before the file reaches the device.{" "}
-              <strong>In production:</strong> the server additionally password-encrypts the PDF using qpdf/ghostscript
-              before delivery, so the downloaded file cannot be opened without the assigned password.
+              PDF is rendered to canvas via PDF.js — the raw file never reaches the browser.
+              Ctrl+P, Cmd+P, Ctrl+S, right-click and drag are all blocked.
+              In production, the file is served via a signed S3 URL with a short expiry — inaccessible outside the app.
             </InfoBox>
           </div>
         )}
@@ -111,15 +108,14 @@ export default function ViewPage({ materials }) {
               marginBottom: 18, flexWrap: "wrap" }}>
               <Badge type="ppt" />
               <span style={{ fontSize: 15, fontWeight: 600, color: C.text }}>{mat.title}</span>
-              <LockChip label="View only · watermark on download"
+              <LockChip label="View only · fully protected"
                 bg={C.amberLight} color={C.amber} />
             </div>
             <PPTViewer arrayBuffer={mat.arrayBuffer} title={mat.title} />
             <InfoBox>
-              <strong>View:</strong> Slides parsed from PPTX in-browser using JSZip — text and images
-              rendered cleanly with no watermark. Right-click and drag disabled.{" "}
-              <strong>In production:</strong> server converts PPTX → PDF via LibreOffice, injects
-              trainer watermark server-side, and serves via a signed S3 URL to the canvas viewer.
+              Slides are parsed from PPTX in-browser using JSZip and rendered to screen — the original file is never exposed.
+              Right-click and drag are disabled. In production, the server converts PPTX → PDF via LibreOffice
+              and serves it via a signed S3 URL directly to the secure canvas viewer.
             </InfoBox>
           </div>
         )}

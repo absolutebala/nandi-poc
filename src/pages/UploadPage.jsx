@@ -88,7 +88,7 @@ export default function UploadPage({ materials, onAdd, onRemove, showToast }) {
       <div style={{ flex: 1, overflowY: "auto", padding: "24px",
         borderRight: `0.5px solid ${C.border}` }}>
         <p style={{ fontSize: 13, color: C.muted, marginBottom: 20, lineHeight: 1.6 }}>
-          Upload training materials. Trainers can <strong>view</strong> but never <strong>download</strong> without a watermark.
+          Upload training materials. Trainers can <strong>view</strong> materials securely. Files are fully protected.
         </p>
 
         <SectionCard icon="▶" iconBg={C.purpleLight} iconColor={C.purple}
@@ -115,14 +115,14 @@ export default function UploadPage({ materials, onAdd, onRemove, showToast }) {
 
         <SectionCard icon="P" iconBg={C.coralLight} iconColor={C.coral}
           title="Upload PDF"
-          note="Rendered to canvas via PDF.js. Watermark applied only on download.">
+          note="Rendered to canvas via PDF.js. Files are protected and cannot be extracted.">
           <DropZone label="Drop PDF here" subLabel="Click to browse · .pdf"
             accept=".pdf" onChange={handlePdf} />
         </SectionCard>
 
         <SectionCard icon="S" iconBg={C.amberLight} iconColor={C.amber}
           title="Upload PPT / PPTX"
-          note="Slides parsed and displayed in-browser. Watermark applied on download.">
+          note="Slides parsed and displayed in-browser. Files are protected and cannot be extracted.">
           <DropZone label="Drop PPT / PPTX here" subLabel="Click to browse · .ppt .pptx"
             accept=".ppt,.pptx" onChange={handlePpt} />
         </SectionCard>
