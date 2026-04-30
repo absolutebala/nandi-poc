@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import UploadPage from "./pages/UploadPage.jsx";
 import ViewPage from "./pages/ViewPage.jsx";
+import ConditionsPage from "./pages/ConditionsPage.jsx";
 import SecurityAlert from "./components/SecurityAlert.jsx";
 import { useSecurityBlock } from "./hooks/useSecurityBlock.js";
 
@@ -126,8 +127,9 @@ export default function App() {
           </div>
         </div>
 
-        {navItem("upload", "Upload materials")}
-        {navItem("view",   "View materials")}
+        {navItem("upload",     "Upload materials")}
+        {navItem("view",       "View materials")}
+        {navItem("conditions", "Conditions")}
 
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 10, background: "#E1F5EE", color: "#085041",
@@ -145,7 +147,9 @@ export default function App() {
         {tab === "upload"
           ? <UploadPage materials={materials} onAdd={addMaterial}
               onRemove={removeMaterial} showToast={showToast} />
-          : <ViewPage   materials={materials} showToast={showToast} />
+          : tab === "view"
+          ? <ViewPage   materials={materials} showToast={showToast} />
+          : <ConditionsPage />
         }
       </main>
 
