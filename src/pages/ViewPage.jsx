@@ -90,15 +90,15 @@ export default function ViewPage({ materials }) {
                 bg={C.coralLight} color={C.coral} />
             </div>
 
-            <PDFViewer arrayBuffer={mat.arrayBuffer} trainerName={TRAINER_NAME} />
+            <PDFViewer arrayBuffer={mat.arrayBuffer} trainerName={TRAINER_NAME} title={mat.title} />
 
             <InfoBox>
-              <strong>How it's protected:</strong> Rendered page-by-page to an HTML canvas via PDF.js.
-              The original PDF binary is never exposed — only canvas pixels.
-              Watermark (trainer name + date) is painted directly onto the canvas on every page.
-              Right-click, drag and context menu are disabled.{" "}
-              <strong>In production:</strong> the file lives in a private S3 bucket, served via a
-              short-lived signed URL, and the watermark is injected server-side before delivery.
+              <strong>View:</strong> Clean render via PDF.js canvas — no watermark, no distractions.
+              Ctrl+P, Cmd+P, Ctrl+S, right-click and drag are all blocked.{" "}
+              <strong>Download:</strong> Clicking the download button applies a watermark (trainer name + date)
+              using pdf-lib before the file reaches the device.{" "}
+              <strong>In production:</strong> the server additionally password-encrypts the PDF using qpdf/ghostscript
+              before delivery, so the downloaded file cannot be opened without the assigned password.
             </InfoBox>
           </div>
         )}
